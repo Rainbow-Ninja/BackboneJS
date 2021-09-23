@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ccbce910-cc57-4f69-a62b-b7c54f434883" name="Default Changelist" comment="" />
+    <list default="true" id="ccbce910-cc57-4f69-a62b-b7c54f434883" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackBoneTute2/ToDo.html" beforeDir="false" afterPath="$PROJECT_DIR$/BackBoneTute2/ToDo.html" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -68,7 +71,7 @@
       <option name="presentableId" value="Default" />
       <updated>1632283558578</updated>
       <workItem from="1632283559866" duration="2013000" />
-      <workItem from="1632286105847" duration="4051000" />
+      <workItem from="1632286105847" duration="5882000" />
     </task>
     <servers />
   </component>

@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>Hello World in Backbone.js</title>
+    <style>
+        #todo-list input.edit {
+            display: none; /* Hides input box*/
+        }
+        #todo-list .editing label {
+            display: none; /* Hides label text when .editing*/
+        }
+        #todo-list .editing input.edit {
+            display: inline; /* Shows input text box when .editing*/
+        }
+    </style>
 </head>
 <body>
 
@@ -19,8 +30,10 @@
 
 <script type="text/template" id="item-template">
     <div class="view">
-        <input class="toggle" type="checkbox">
+        <input class="toggle" type="checkbox" <%= completed ? 'checked' : '' %>>
         <label><%- title %></label>
+        <input class="edit" value="<%- title %>">
+        <button class="destroy">remove</button>
     </div>
 </script>
 
@@ -32,11 +45,14 @@
 <script type="text/javascript">
     var app = {}; // create namespace for our app
 
-    //model for our todos
+    //MODEL for our todos
     app.Todo = Backbone.Model.extend({
         defaults: {
             title: '',
             completed: false
+        },
+        toggle: function(){
+            this.save({ completed: !this.get('completed')});
         }
     });
 
@@ -49,19 +65,52 @@
     // instance of the Collection
     app.todoList = new app.TodoList();
 
-    //renders individual todo items list
+    //VIEWS renders individual todo items list
     app.TodoView = Backbone.View.extend({
         tagName: 'li',
         template: _.template($('#item-template').html()),
         render: function(){
             this.$el.html(this.template(this.model.toJSON()));
+            this.input = this.$('.edit');
             return this; // enable chained calls
+        },
+        initialize: function(){
+            this.model.on('change', this.render, this);
+            // remove: Convenience Backbone's function for removing the view from the DOM.
+            this.model.on('destroy', this.remove, this);
+        },
+        events: {
+            'dblclick label' : 'edit',
+            'keypress .edit' : 'updateOnEnter',
+            'blur .edit' : 'close',
+            'click .toggle': 'toggleCompleted',
+            'click .destroy': 'destroy'
+        },
+        edit: function(){
+            this.$el.addClass('editing');
+            this.input.focus();
+        },
+        close: function(){
+            var value = this.input.val().trim();
+            if(value) {
+                this.model.save({title: value});
+            }
+            this.$el.removeClass('editing');
+        },
+        updateOnEnter: function(e){
+            if(e.keyCode == 13) {
+                this.close();
+            }
+        },
+        toggleCompleted: function(){
+            this.model.toggle();
+        },
+        destroy: function(){
+            this.model.destroy();
         }
     });
 
-    // var view = new app.TodoView({model: todo});
-
-    // renders the full list of todo items calling TodoView for each one.
+    // VIEWS renders the full list of todo items calling TodoView for each one.
     app.AppView = Backbone.View.extend({
         el: '#todoapp',
         initialize: function () {
