@@ -21,7 +21,12 @@
 <section id="todoapp">
     <header id="header">
         <h1>Todos</h1>
-        <input id="new-todo" placeholder="What needs to be done?">
+        <input id="new-todo" placeholder="What needs to be done?" autofocus>
+        <div>
+            <a href="#/">show all</a> |
+            <a href="#/pending">show pending</a> |
+            <a href="#/completed">show completed</a>
+        </div>
     </header>
     <section id="main">
         <ul id="todo-list"></ul>
@@ -45,7 +50,7 @@
 <script type="text/javascript">
     var app = {}; // create namespace for our app
 
-    //MODEL for our todos
+    //MODEL for our todos ---------------------------------------------------------------------------------------------
     app.Todo = Backbone.Model.extend({
         defaults: {
             title: '',
@@ -56,16 +61,24 @@
         }
     });
 
-    //Collections
+    //COLLECTIONS -----------------------------------------------------------------------------------------------------
     app.TodoList = Backbone.Collection.extend({
         model: app.Todo,
-        localStorage: new Store("backbone-todo")
+        localStorage: new Store("backbone-todo"),
+        completed: function() {
+            return this.filter(function( todo ) {
+                return todo.get('completed');
+            });
+        },
+        remaining: function() {
+            return this.without.apply( this, this.completed() );
+        }
     });
 
     // instance of the Collection
     app.todoList = new app.TodoList();
 
-    //VIEWS renders individual todo items list
+    //VIEWS renders individual todo items list ------------------------------------------------------------------------
     app.TodoView = Backbone.View.extend({
         tagName: 'li',
         template: _.template($('#item-template').html()),
@@ -110,7 +123,7 @@
         }
     });
 
-    // VIEWS renders the full list of todo items calling TodoView for each one.
+    // VIEWS renders the full list of todo items calling TodoView for each one ----------------------------------------
     app.AppView = Backbone.View.extend({
         el: '#todoapp',
         initialize: function () {
@@ -141,7 +154,19 @@
         },
         addAll: function(){
             this.$('#todo-list').html(''); // clean the todo list
-            app.todoList.each(this.addOne, this);
+            // app.todoList.each(this.addOne, this);
+            // filter todo item list
+            switch(window.filter){
+                case 'pending':
+                    _.each(app.todoList.remaining(), this.addOne);
+                    break;
+                case 'completed':
+                    _.each(app.todoList.completed(), this.addOne);
+                    break;
+                default:
+                    app.todoList.each(this.addOne, this);
+                    break;
+            }
         },
         newAttributes: function(){
             return {
@@ -151,7 +176,21 @@
         }
     });
 
-    //initializer
+    //ROUTER ----------------------------------------------------------------------------------------------------------
+    app.Router = Backbone.Router.extend({
+        routes: {
+            '*filter' : 'setFilter'
+        },
+        setFilter: function(params) {
+            console.log('app.router.params = ' + params); // just for show/learning
+            window.filter = params.trim() || '';
+            app.todoList.trigger('reset');
+        }
+    });
+
+    //INITIALIZER -----------------------------------------------------------------------------------------------------
+    app.router = new app.Router();
+    Backbone.history.start();
     app.appView = new app.AppView();
 
 </script>
